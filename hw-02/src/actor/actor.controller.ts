@@ -18,6 +18,11 @@ export class ActorController {
     return this.actorService.findAll(query);
   }
 
+  @Get('/film')
+  findAllFromFilm(@Query('filmId') filmId: String) {
+    return this.actorService.findAllFromFilm(+filmId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.actorService.findOne(+id);

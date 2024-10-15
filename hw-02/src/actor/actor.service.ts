@@ -5,12 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Actor } from './entities/actor.entity';
 import { Repository } from 'typeorm';
 import { GetActor } from './dto/get-actors.dto';
+import { Film } from '../film/entities/film.entity';
 
 @Injectable()
 export class ActorService {
   constructor(
     @InjectRepository(Actor)
     private actorRepository: Repository<Actor>,
+    @InjectRepository(Film)
+    private filmRepository: Repository<Film>,
   ) {}
 
   create(createActorDto: CreateActorDto) {
@@ -44,5 +47,15 @@ export class ActorService {
 
   remove(id: number) {
     return this.actorRepository.delete(id);
+  }
+
+  async findAllFromFilm(filmId: number) {
+    const film = await this.filmRepository.findOne({
+      where: {filmId},
+      relations: {
+        actors: true
+      }
+    });
+    return film.actors;
   }
 }

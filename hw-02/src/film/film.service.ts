@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { GetFilmsDto } from './dto/get-films.dto';
 import { Language } from '../language/entities/language.entity';
 import { GetActorFilms } from './dto/get-actor-films.dto';
+import { Actor } from '../actor/entities/actor.entity';
+import { FilmActor } from './dto/film-actor.dto';
 
 @Injectable()
 export class FilmService {
@@ -14,7 +16,9 @@ export class FilmService {
     @InjectRepository(Film)
     private filmRepository: Repository<Film>,
     @InjectRepository(Language)
-    private languageRepository: Repository<Language>
+    private languageRepository: Repository<Language>,
+    @InjectRepository(Actor)
+    private actorRepository: Repository<Actor>
   ) {}
 
   async create(createFilmDto: CreateFilmDto) {
@@ -106,5 +110,52 @@ export class FilmService {
 
   remove(id: number) {
     return this.filmRepository.delete({filmId: id})
+  }
+
+  async addActorToFilm(query: FilmActor) {
+    const {actorId, filmId} = query;
+
+    const actor = await this.actorRepository.findOneBy({actorId});
+    const film = await this.filmRepository.findOne({
+      where: {filmId},
+      relations: {
+        actors: true
+      }
+    });
+
+    if(film.actors.some(a => a.actorId === actor.actorId)) {
+      // Do something here
+      return {
+        message: "Actor already in this film"
+      }
+    }
+
+    film.actors.push(actor);
+    return await this.filmRepository.save(film);
+  }
+
+  async removeActorFromFilm(query: FilmActor) {
+    const {actorId, filmId} = query;
+
+    const actor = await this.actorRepository.findOneBy({actorId});
+    const film = await this.filmRepository.findOne({
+      where: {filmId},
+      relations: {
+        actors: true
+      }
+    });
+
+    if(!film.actors.some(a => a.actorId === actor.actorId)) {
+      // Do something here
+      return {
+        message: "Actor not in this film"
+      }
+    }
+
+    film.actors = film.actors.filter((a) => {
+      return a.actorId !== actor.actorId;
+    })
+
+    return await this.filmRepository.save(film);
   }
 }
