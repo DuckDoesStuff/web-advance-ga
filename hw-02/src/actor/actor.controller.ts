@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/create-actor.dto';
 import { UpdateActorDto } from './dto/update-actor.dto';
@@ -19,8 +19,8 @@ export class ActorController {
   }
 
   @Get('/film')
-  findAllFromFilm(@Query('filmId') filmId: String) {
-    return this.actorService.findAllFromFilm(+filmId);
+  findAllFromFilm(@Query('filmId', ParseIntPipe) filmId: number) {
+    return this.actorService.findAllFromFilm(filmId);
   }
 
   @Get(':id')
