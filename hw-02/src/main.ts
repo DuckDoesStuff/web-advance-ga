@@ -1,15 +1,26 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppExceptionFilter } from './utils/app.filter';
+import { ResponseInterceptor } from './utils/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
     skipMissingProperties: false, // forbid missing fields
     forbidNonWhitelisted: true,  // forbid redundant fields
-    transform: true
+    whitelist: true,
+    transform: true,
+    stopAtFirstError: true
   }));
+
+  app.useGlobalFilters(new AppExceptionFilter());
+  
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    new ResponseInterceptor()
+  );
 
   const config = new DocumentBuilder()
     .setTitle('API document')

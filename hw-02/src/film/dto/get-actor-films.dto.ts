@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 
 export class GetActorFilms {
@@ -8,6 +8,7 @@ export class GetActorFilms {
 		example: "PENELOPE"
 	})
 	@IsString()
+  @IsNotEmpty({message: "firstName is required"})
 	firstName: String;
 
 	@ApiProperty({
@@ -15,5 +16,6 @@ export class GetActorFilms {
 		example: "GUINESS"
 	})
 	@IsString()
+  @IsNotEmpty({message: "firstName is required"})
 	lastName: String;
 }

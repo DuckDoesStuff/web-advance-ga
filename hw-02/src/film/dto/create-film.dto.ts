@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Rating } from '../entities/rating.enum';
 import { SpecialFeatures } from '../entities/special_features.set';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -9,6 +9,7 @@ export class CreateFilmDto {
     example: 'Inception',
   })
   @IsString()
+  @IsNotEmpty({message: "title is required"})
   title: string;
 
   @ApiPropertyOptional({
@@ -24,6 +25,7 @@ export class CreateFilmDto {
     example: 2010,
     maximum: new Date().getFullYear(),
   })
+  @IsNotEmpty({message: "releaseYear is required"})
   @IsInt()
   releaseYear: number;
 
@@ -32,6 +34,7 @@ export class CreateFilmDto {
     example: 148,
     minimum: 1,
   })
+  @IsNotEmpty({message: "length is required"})
   @IsNumber()
   length: number;
 
@@ -40,12 +43,14 @@ export class CreateFilmDto {
     example: 'English',
   })
   @IsString()
+  @IsNotEmpty({message: "language is required"})
   language: string;
 
   @ApiProperty({
     description: 'Original language of the film',
     example: 'English',
   })
+  @IsNotEmpty({message: "originalLanguage is required"})
   @IsString()
   originalLanguage: string;
 
@@ -55,6 +60,7 @@ export class CreateFilmDto {
     example: Rating.PG_13,
   })
   @IsEnum(Rating)
+  @IsNotEmpty({message: "rating is required"})
   rating: Rating;
 
   @ApiProperty({
@@ -63,5 +69,6 @@ export class CreateFilmDto {
     example: SpecialFeatures['Behind the Scenes'],
   })
   @IsEnum(SpecialFeatures)
+  @IsNotEmpty({message: "specialFeatures is required"})
   specialFeatures: SpecialFeatures;
 }

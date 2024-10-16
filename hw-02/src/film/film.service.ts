@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { Language } from '../language/entities/language.entity';
 import { GetActorFilms } from './dto/get-actor-films.dto';
 import { Actor } from '../actor/entities/actor.entity';
 import { FilmActor } from './dto/film-actor.dto';
+import AppException from '../utils/app.exception';
 
 @Injectable()
 export class FilmService {
@@ -18,13 +19,30 @@ export class FilmService {
     @InjectRepository(Language)
     private languageRepository: Repository<Language>,
     @InjectRepository(Actor)
-    private actorRepository: Repository<Actor>
+    private actorRepository: Repository<Actor>,
   ) {}
 
   async create(createFilmDto: CreateFilmDto) {
-    const language = await this.languageRepository.findOneBy({name: createFilmDto.language})
-    const originalLanguage = await this.languageRepository.findOneBy({name: createFilmDto.originalLanguage})
-    
+    const language = await this.languageRepository.findOneBy({
+      name: createFilmDto.language,
+    });
+    if (!language) {
+      throw new AppException(
+        `language: ${createFilmDto.language} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const originalLanguage = await this.languageRepository.findOneBy({
+      name: createFilmDto.originalLanguage,
+    });
+    if (!originalLanguage) {
+      throw new AppException(
+        `originalLanguage: ${createFilmDto.originalLanguage} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     const film = this.filmRepository.create({
       title: createFilmDto.title,
       description: createFilmDto.description,
@@ -33,20 +51,13 @@ export class FilmService {
       language: language,
       originalLanguage: originalLanguage,
       rating: createFilmDto.rating,
-      specialFeatures: createFilmDto.specialFeatures
+      specialFeatures: createFilmDto.specialFeatures,
     });
     return this.filmRepository.save(film);
   }
 
   findAll(query: GetFilmsDto) {
-    const {
-      cate,
-      lang,
-      title,
-      limit,
-      offset,
-    } = query;
-
+    const { cate, lang, title, limit, offset } = query;
 
     const qb = this.filmRepository
       .createQueryBuilder('film')
@@ -65,69 +76,109 @@ export class FilmService {
       qb.andWhere('film.title LIKE :title', { title: `%${title}%` });
     }
 
-    limit ? qb.take(limit): qb.take(5);
+    limit ? qb.take(limit) : qb.take(5);
     offset ? qb.skip(offset) : qb.skip(0);
 
     return qb.getMany();
   }
 
   findOne(id: number) {
-    return this.filmRepository.findBy({filmId: id});
+    return this.filmRepository.findBy({ filmId: id });
   }
 
   findByActor(query: GetActorFilms) {
-    const {firstName, lastName} = query;
+    const { firstName, lastName } = query;
 
     const qb = this.filmRepository
       .createQueryBuilder('film')
-      .leftJoinAndSelect('film.actors', 'actor')
+      .leftJoinAndSelect('film.actors', 'actor');
 
-    qb.andWhere('actor.firstName = :firstName', {firstName})
-      .andWhere('actor.lastName = :lastName', {lastName})
+    qb.andWhere('actor.firstName = :firstName', { firstName }).andWhere(
+      'actor.lastName = :lastName',
+      { lastName },
+    );
 
     return qb.getMany();
   }
 
   async update(id: number, updateFilmDto: UpdateFilmDto) {
-    let film = await this.filmRepository.findOneBy({filmId: id});
+    let film = await this.filmRepository.findOneBy({ filmId: id });
+    if (!film) {
+      throw new AppException(
+        `Film not found with id: ${id}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
-    let language = film.language; 
+    let language = film.language;
     let originalLanguage = film.originalLanguage;
 
-    if (updateFilmDto.language)
-      language = await this.languageRepository.findOneBy({name: "English"});
-    if (updateFilmDto.originalLanguage)
-      originalLanguage = await this.languageRepository.findOneBy({name: "English"});
+    if (updateFilmDto.language) {
+      language = await this.languageRepository.findOneBy({ name: 'English' });
+
+      if (!language) {
+        throw new AppException(
+          `language: ${updateFilmDto.language} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    }
+
+    if (updateFilmDto.originalLanguage) {
+      originalLanguage = await this.languageRepository.findOneBy({name: 'English'});
+      if (!originalLanguage) {
+        throw new AppException(
+          `originalLanguage: ${updateFilmDto.originalLanguage} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    }
 
     film = {
       ...film,
       ...updateFilmDto,
       language,
-      originalLanguage
-    }
+      originalLanguage,
+    };
     return this.filmRepository.save(film);
   }
 
-  remove(id: number) {
-    return this.filmRepository.delete({filmId: id})
+  async remove(filmId: number) {
+    if(!await this.filmRepository.findOneBy({filmId}))
+      throw new AppException(
+        `Film not found with id: ${filmId}`,
+        HttpStatus.NOT_FOUND
+      )
+    return this.filmRepository.delete({ filmId });
   }
 
   async addActorToFilm(query: FilmActor) {
-    const {actorId, filmId} = query;
+    const { actorId, filmId } = query;
 
-    const actor = await this.actorRepository.findOneBy({actorId});
+    const actor = await this.actorRepository.findOneBy({ actorId });
+    if(!actor) throw new AppException(
+        `Actor not found with id: ${actorId}`,
+        HttpStatus.NOT_FOUND
+      )
+
     const film = await this.filmRepository.findOne({
-      where: {filmId},
+      where: { filmId },
       relations: {
-        actors: true
-      }
+        actors: true,
+      },
     });
 
-    if(film.actors.some(a => a.actorId === actor.actorId)) {
+    if(!film) throw new AppException(
+      `Film not found with id: ${filmId}`,
+      HttpStatus.NOT_FOUND
+    )
+
+    if (film.actors.some((a) => a.actorId === actor.actorId)) {
       // Do something here
       return {
-        message: "Actor already in this film"
-      }
+        code: HttpStatus.FORBIDDEN,
+        message: 'Actor already in this film',
+      };
     }
 
     film.actors.push(actor);
@@ -135,26 +186,36 @@ export class FilmService {
   }
 
   async removeActorFromFilm(query: FilmActor) {
-    const {actorId, filmId} = query;
+    const { actorId, filmId } = query;
 
-    const actor = await this.actorRepository.findOneBy({actorId});
+    const actor = await this.actorRepository.findOneBy({ actorId });
+    if(!actor) throw new AppException(
+        `Actor not found with id: ${actorId}`,
+        HttpStatus.NOT_FOUND
+      )
+
     const film = await this.filmRepository.findOne({
-      where: {filmId},
+      where: { filmId },
       relations: {
-        actors: true
-      }
+        actors: true,
+      },
     });
 
-    if(!film.actors.some(a => a.actorId === actor.actorId)) {
+    if(!film) throw new AppException(
+      `Film not found with id: ${filmId}`,
+      HttpStatus.NOT_FOUND
+    )
+    if (!film.actors.some((a) => a.actorId === actor.actorId)) {
       // Do something here
       return {
-        message: "Actor not in this film"
-      }
+        code: HttpStatus.FORBIDDEN,
+        message: 'Actor not in this film',
+      };
     }
 
     film.actors = film.actors.filter((a) => {
       return a.actorId !== actor.actorId;
-    })
+    });
 
     return await this.filmRepository.save(film);
   }

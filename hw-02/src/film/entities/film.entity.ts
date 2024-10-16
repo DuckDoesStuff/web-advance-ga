@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { Rating } from './rating.enum';
 import { SpecialFeatures } from './special_features.set';
-import { Exclude } from 'class-transformer';
 import { Category } from '../../category/entities/category.entity';
 import { Actor } from '../../actor/entities/actor.entity';
 

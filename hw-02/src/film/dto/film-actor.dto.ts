@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsInt } from "class-validator";
+import { IsInt, IsNotEmpty } from "class-validator";
 
 export class FilmActor {
 	@ApiProperty({
@@ -8,6 +8,7 @@ export class FilmActor {
 		example: 1
 	})
 	@Type(() => Number)
+  @IsNotEmpty({message: "actorId is required"})
 	@IsInt()
 	actorId: Number;
 
@@ -17,5 +18,6 @@ export class FilmActor {
 	})
 	@IsInt()
 	@Type(() => Number)
+  @IsNotEmpty({message: "filmId is required"})
 	filmId: number;
 }

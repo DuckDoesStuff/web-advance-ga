@@ -1,16 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpCode, ParseIntPipe } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { GetFilmsDto } from './dto/get-films.dto';
 import { GetActorFilms } from './dto/get-actor-films.dto';
 import { FilmActor } from './dto/film-actor.dto';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Film } from './entities/film.entity';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags("film")
 @Controller('film')
-@UseInterceptors(ClassSerializerInterceptor)
 export class FilmController {
   constructor(private readonly filmService: FilmService) {}
 
@@ -21,6 +19,7 @@ export class FilmController {
     status: HttpStatus.CREATED,
     description: "Return the film entity"
   })
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() createFilmDto: CreateFilmDto) {
     return this.filmService.create(createFilmDto);
@@ -55,16 +54,17 @@ export class FilmController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: "Return film entity with list of actors"
+    description: "Return film entity with list of actors",
   })
   @ApiResponse({
-    status: HttpStatus.NOT_ACCEPTABLE,
+    status: HttpStatus.NOT_FOUND,
     description: "Actor or film not found"
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
     description: "This actor is already in this film"
   })
+  @HttpCode(HttpStatus.OK)
   @Post("/actor")
   addActorToFilm(@Query() query: FilmActor) {
     return this.filmService.addActorToFilm(query);
@@ -78,7 +78,7 @@ export class FilmController {
     description: "Return film entity with list of actors"
   })
   @ApiResponse({
-    status: HttpStatus.NOT_ACCEPTABLE,
+    status: HttpStatus.NOT_FOUND,
     description: "Actor or film not found"
   })
   @ApiResponse({
@@ -104,8 +104,8 @@ export class FilmController {
     description: "Return the film entity"
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filmService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.filmService.findOne(id);
   }
 
   @ApiOperation({
@@ -122,7 +122,7 @@ export class FilmController {
     description: "Return the updated film entity"
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFilmDto: UpdateFilmDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateFilmDto: UpdateFilmDto) {
     return this.filmService.update(+id, updateFilmDto);
   }
 
