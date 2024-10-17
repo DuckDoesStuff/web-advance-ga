@@ -6,6 +6,7 @@ import { Actor } from './entities/actor.entity';
 import { Repository } from 'typeorm';
 import { GetActor } from './dto/get-actors.dto';
 import { Film } from '../film/entities/film.entity';
+import AppException from '../utils/app.exception';
 
 @Injectable()
 export class ActorService {
@@ -37,15 +38,32 @@ export class ActorService {
     return qb.getMany();
   }
 
-  findOne(id: number) {
-    return this.actorRepository.findOneBy({ actorId: id });
+  async findOne(id: number) {
+    const actor = await this.actorRepository.findOneBy({ actorId: id });
+    if(!actor) throw new AppException(
+      `Actor not found with id: ${id}`,
+      404
+    )
+    return actor;
   }
 
-  update(id: number, updateActorDto: UpdateActorDto) {
-    return this.actorRepository.update({actorId: id}, updateActorDto)
+  async update(id: number, updateActorDto: UpdateActorDto) {
+    let exist = await this.actorRepository.existsBy({actorId: id})
+    if(!exist) 
+      throw new AppException(
+        `Actor not found with id: ${id}`,
+        404
+      )
+    return await this.actorRepository.update({actorId: id}, updateActorDto)
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    let exist = await this.actorRepository.existsBy({actorId: id})
+    if(!exist) 
+      throw new AppException(
+        `Actor not found with id: ${id}`,
+        404
+      )
     return this.actorRepository.delete(id);
   }
 
@@ -56,6 +74,11 @@ export class ActorService {
         actors: true
       }
     });
+    if(!film) 
+      throw new AppException(
+        `Film not found with id: ${filmId}`,
+        404
+      )
     return film.actors;
   }
 }
