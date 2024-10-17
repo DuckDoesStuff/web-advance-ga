@@ -44,25 +44,31 @@
 
 ### Running the Application
 
-1. **Build the project (Optional):**
+1. **Install packages:**
+
+    ```sh
+    npm install
+    ```
+
+2. **Build the project (Optional):**
 
     ```sh
     npm run build
     ```
 
-2. **Start the application:**
+3. **Start the application:**
 
     ```sh
     npm run start
     ```
 
-3. **Start the application in development mode:**
+4. **Start the application in development mode:**
 
     ```sh
     npm run start:dev
     ```
 
-4. **Start the application in debug mode:**
+5. **Start the application in debug mode:**
 
     ```sh
     npm run start:debug
