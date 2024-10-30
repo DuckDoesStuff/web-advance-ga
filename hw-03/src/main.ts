@@ -1,9 +1,7 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppExceptionFilter } from './utils/app.filter';
-import { ResponseInterceptor } from './utils/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,12 +13,12 @@ async function bootstrap() {
     stopAtFirstError: true
   }));
 
-  app.useGlobalFilters(new AppExceptionFilter());
+  // app.useGlobalFilters(new AppExceptionFilter());
   
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-    new ResponseInterceptor()
-  );
+  // app.useGlobalInterceptors(
+  //   new ClassSerializerInterceptor(app.get(Reflector)),
+  //   new ResponseInterceptor()
+  // );
 
   const config = new DocumentBuilder()
     .setTitle('API document')

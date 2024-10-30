@@ -39,7 +39,7 @@ export class CreateFilmDto {
   length: number;
 
   @ApiProperty({
-    description: 'Language of the film',
+    description: 'Language of the film, first letter is capitalized',
     example: 'English',
   })
   @IsString()
@@ -66,9 +66,11 @@ export class CreateFilmDto {
   @ApiProperty({
     description: 'Special features included in the film',
     enum: SpecialFeatures,
-    example: SpecialFeatures['Behind the Scenes'],
+    example: SpecialFeatures.BEHIND_THE_SCENES,
   })
-  @IsEnum(SpecialFeatures)
+  @IsEnum(SpecialFeatures, {
+		each: true
+	})
   @IsNotEmpty({message: "specialFeatures is required"})
   specialFeatures: SpecialFeatures;
 }

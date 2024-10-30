@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateActorDto } from './dto/create-actor.dto';
 import { UpdateActorDto } from './dto/update-actor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GetActor } from './dto/get-actors.dto';
 import { Film } from '../film/entities/film.entity';
 import AppException from '../utils/app.exception';
+import { LoggerService } from '../utils/logger/logger.service';
 
 @Injectable()
 export class ActorService {
@@ -15,6 +16,8 @@ export class ActorService {
     private actorRepository: Repository<Actor>,
     @InjectRepository(Film)
     private filmRepository: Repository<Film>,
+    @Inject()
+    private logger: LoggerService
   ) {}
 
   create(createActorDto: CreateActorDto) {
@@ -24,6 +27,7 @@ export class ActorService {
   }
 
   findAll(query: GetActor) {
+    this.logger.log("Test log");
     const { firstName, lastName, offset, limit } = query;
     const qb = this.actorRepository.createQueryBuilder('actor');
 
