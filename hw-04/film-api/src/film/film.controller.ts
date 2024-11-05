@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { FilmService } from './film.service';
 import { GetFilmsDto } from './dto/get-films.dto';
 
-@Controller('film')
+@Controller('films')
 export class FilmController {
   constructor(private readonly filmService: FilmService) {}
 

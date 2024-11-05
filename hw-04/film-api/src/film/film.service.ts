@@ -16,7 +16,7 @@ export class FilmService {
   //   return 'This action adds a new film';
   // }
 
-  findAll(query: GetFilmsDto) {
+  async findAll(query: GetFilmsDto) {
     const { title, limit, offset } = query;
 
     const qb = this.filmRepository

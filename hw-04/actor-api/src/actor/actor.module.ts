@@ -3,6 +3,7 @@ import { ActorService } from './actor.service';
 import { ActorController } from './actor.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Actor } from './entities/actor.entity';
+import { Token } from '../auth/entities/token.entity';
 
 @Module({
   imports: [
