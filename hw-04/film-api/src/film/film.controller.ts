@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { GetFilmsDto } from './dto/get-films.dto';
+import { ApiKeyGuard } from '../guards/api-key.guard';
 
 @Controller('films')
+@UseGuards(ApiKeyGuard)
 export class FilmController {
   constructor(private readonly filmService: FilmService) {}
 

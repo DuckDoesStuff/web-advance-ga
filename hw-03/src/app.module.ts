@@ -15,19 +15,20 @@ import { LoggerInterceptor } from './utils/logger/logger.interceptor';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'admin',
-      password: 'admin123',
-      database: 'root',
-      // autoLoadEntities: true,
-      entities: [Actor, Language, Category, Film],
-      namingStrategy: new SnakeNamingStrategy(),
-    }),
-    LoggerModule,
-    FilmModule, ActorModule],
+      TypeOrmModule.forRoot({
+        type: 'mysql',
+        host: 'localhost',
+        port: 3306,
+        username: 'admin',
+        password: 'admin123',
+        database: 'root',
+        // autoLoadEntities: true,
+        entities: [Actor, Language, Category, Film],
+        namingStrategy: new SnakeNamingStrategy(),
+      }),
+      LoggerModule,
+      FilmModule, ActorModule
+    ],
     providers: [
       {
         provide: APP_FILTER,

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request, UseGuards } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { GetFilmsDto } from './dto/get-films.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('films')
 export class FilmController {
@@ -13,9 +14,10 @@ export class FilmController {
   //   return this.filmService.create(createFilmDto);
   // }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Query() query: GetFilmsDto) {
-    return this.filmService.findAll(query);
+  findAll(@Request() req, @Query() query: GetFilmsDto) {
+    return this.filmService.findAll(req);
   }
 
   // @Patch(':id')

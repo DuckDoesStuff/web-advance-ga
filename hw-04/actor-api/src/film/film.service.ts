@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { GetFilmsDto } from './dto/get-films.dto';
 import { AxiosService } from '../axios/axios.service';
+import { Request } from 'express';
 
 @Injectable()
 export class FilmService {
@@ -15,9 +16,9 @@ export class FilmService {
   //   return 'This action adds a new film';
   // }
 
-  async findAll(query: GetFilmsDto) {
-    const result = await this.axiosService.get("/films", query)
-    return result.data
+  async findAll(req: Request) {
+    const result = await this.axiosService.get(req)
+    return result
   }
 
   // findOne(id: number) {
