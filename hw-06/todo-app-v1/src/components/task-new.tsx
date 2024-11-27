@@ -13,6 +13,7 @@ export default function TaskNew({createTask} : {createTask: (newTask: ITask) => 
         if(task.title != "" && task.description != "") {
             setTask({...task, done: false, id: Math.random().toString(36).substring(2, 10)});
             createTask(task);
+            setTask({...task, title: "", description: ""})
         }
     }
 
@@ -21,9 +22,11 @@ export default function TaskNew({createTask} : {createTask: (newTask: ITask) => 
             <input
                 onChange={(e) => setTask({...task, title: e.target.value})}
                 placeholder={"Task title"}
+                value={task.title}
                 className={"bg-white px-5 py-2 rounded-xl outline-none text-lg placeholder:text-deepGreen placeholder:italic"}/>
             <textarea
                 onChange={(e) => setTask({...task, description: e.target.value})}
+                value={task.description}
                 placeholder={"Task description"}
                 className={"bg-white max-h-60 min-h-60 px-5 py-2 rounded-xl outline-none text-lg placeholder:text-deepGreen placeholder:italic"}/>
             <button
