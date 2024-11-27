@@ -1,9 +1,12 @@
-import {createContext} from "react";
-import ITask from "../dto/ITask";
+import React, {createContext} from "react";
+import {ActionType, StateType} from "./TaskListProvider.tsx";
 
 interface ITaskListContext {
-    tasks: ITask[];
-    setTasks: (tasks: ITask[]) => void;
+    state: StateType;
+    dispatch:  React.Dispatch<ActionType>;
 }
 
-export const TaskListContext = createContext<ITaskListContext | null>(null);
+export const TaskListContext = createContext<ITaskListContext>({
+    state: {tasks: [], filteredTasks: []},
+    dispatch: () => {}
+});

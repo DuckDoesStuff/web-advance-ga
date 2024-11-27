@@ -28,7 +28,6 @@ export class FilmService {
 
     limit ? qb.take(limit) : qb.take(5);
     offset ? qb.skip(offset) : qb.skip(0);
-
     return qb.getMany();
   }
 
