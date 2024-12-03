@@ -18,6 +18,7 @@ export default function TaskItem({task}: { task:ITask }) {
 
     const handleCheck = async () => {
         dispatch({type: "check", payload: task.id});
+        markTask(task.id)
     }
 
     const divStyle =

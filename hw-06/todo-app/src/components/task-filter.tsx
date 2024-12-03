@@ -1,11 +1,17 @@
 import {useContext} from "react";
 import {TaskListContext} from "../contexts/TaskListContext.ts";
+import { getAllTasks, getTaskWithTitle } from "../api/task.api.ts";
 
 export default function TaskFilter() {
     const { dispatch } = useContext(TaskListContext);
 
     const handleSearch = async (title: string) => {
-        dispatch({type: "filter", payload: title})
+        let tasks;
+        if (title == "") 
+            tasks = await getAllTasks();
+        else
+            tasks = await getTaskWithTitle(title);
+        dispatch({type: "filter", payload: tasks})
     }
 
     return (

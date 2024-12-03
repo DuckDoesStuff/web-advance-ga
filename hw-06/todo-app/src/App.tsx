@@ -1,18 +1,12 @@
-import TaskNew from "./components/task-new.tsx";
-import TaskList from "./components/task-list.tsx";
-import TaskFilter from "./components/task-filter.tsx";
+import { RouterProvider } from "react-router";
+import { routes } from "./routes";
 
 function App() {
-    return (
-        <div className={"p-10 bg-deepGreen min-h-[100vh]"}>
-            <TaskNew/>
-
-            <div className={"flex flex-col gap-8 mt-8"}>
-                <TaskFilter/>
-                <TaskList/>
-            </div>
-        </div>
-    )
+	return (
+		<div>
+			<RouterProvider router={routes} />
+		</div>
+	);
 }
 
-export default App
+export default App;

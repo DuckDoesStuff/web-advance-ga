@@ -7,6 +7,6 @@ interface ITaskListContext {
 }
 
 export const TaskListContext = createContext<ITaskListContext>({
-    state: {tasks: [], filteredTasks: []},
+    state: {tasks: []},
     dispatch: () => {}
 });

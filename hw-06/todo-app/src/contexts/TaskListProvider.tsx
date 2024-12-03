@@ -9,29 +9,21 @@ export interface ActionType {
 
 export interface StateType {
     tasks: ITask[];
-    filteredTasks: ITask[];
 }
 
 function reducerFunction(state: StateType, action: ActionType): StateType {
     switch (action.type) {
         case "update":
             return {
-                filteredTasks: action.payload as ITask[],
                 tasks: action.payload as ITask[],
             };
         case "add":
             const newTask = action.payload as ITask;
             return {
-                filteredTasks: [newTask, ...state.filteredTasks],
-                tasks: [newTask, ...state.tasks],
+                tasks: [...state.tasks, newTask],
             };
         case "check":
             return {
-                filteredTasks: state.filteredTasks.map((task) =>
-                    task.id === action.payload
-                        ? { ...task, done: !task.done }
-                        : task
-                ),
                 tasks: state.tasks.map((task) =>
                     task.id === action.payload
                         ? { ...task, done: !task.done }
@@ -39,14 +31,8 @@ function reducerFunction(state: StateType, action: ActionType): StateType {
                 ),
             };
         case "filter":
-            const searchTerm = action.payload as string;
             return {
-                ...state,
-                tasks: searchTerm
-                    ? state.filteredTasks.filter((task) =>
-                          task.title.toLowerCase().includes(searchTerm.toLowerCase())
-                      )
-                    : state.filteredTasks,
+                tasks: action.payload as ITask[]
             };
         default:
             throw new Error("Unknown action type");
@@ -54,25 +40,7 @@ function reducerFunction(state: StateType, action: ActionType): StateType {
 }
 
 export const TaskListProvider = ({children}: { children: React.ReactNode }) => {
-    const initalState: StateType = {
-        tasks: [
-            {
-                id: "1",
-                title: "Test",
-                description: "description",
-                done: false
-            }
-        ],
-        filteredTasks: [
-            {
-                id: "1",
-                title: "Test",
-                description: "description",
-                done: false
-            }
-        ]
-    }
-    const [state, dispatch] = useReducer(reducerFunction, initalState);
+    const [state, dispatch] = useReducer(reducerFunction, {tasks: []});
 
     return (
         <TaskListContext.Provider value={{state, dispatch}}>
